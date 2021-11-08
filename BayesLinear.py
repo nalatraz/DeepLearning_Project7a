@@ -19,12 +19,30 @@ class BayesLinear(Module):
         self.weight_mu = Parameter(torch.Tensor(out_features, in_features))
         self.weight_log_sigma = Parameter(torch.Tensor(out_features, in_features))
         self.register_buffer('weight_eps', None)
-
+        
         self.bias_mu = Parameter(torch.Tensor(out_features))
         self.bias_log_sigma = Parameter(torch.Tensor(out_features))
         self.register_buffer('bias_eps', None)
+        self.bias = True
+            
+        self.bias_mu = Parameter(torch.Tensor(out_features))
+        self.bias_log_sigma = Parameter(torch.Tensor(out_features))
+        self.register_buffer('bias_eps', None)
+        
+        # Sample to assign values to the empty tensors
+        self.reset_parameters()
 
-   def forward(self, input):
+    def reset_parameters(self):
+        # Initialization method of Adv-BNN
+        stdv = 1. / math.sqrt(self.weight_mu.size(1))
+        self.weight_mu.data.uniform_(-stdv, stdv)
+        self.weight_log_sigma.data.fill_(self.prior_log_sigma)
+        if self.bias :
+            self.bias_mu.data.uniform_(-stdv, stdv)
+            self.bias_log_sigma.data.fill_(self.prior_log_sigma)
+            
+#             self.bias_log_sigma.data.fill_(self.prior_log_sigma)
+    def forward(self, input):
         
         if self.weight_eps is None :
             weight = self.weight_mu + torch.exp(self.weight_log_sigma) * torch.randn_like(self.weight_log_sigma)
@@ -42,6 +60,5 @@ class BayesLinear(Module):
         return F.linear(input, weight, bias)
 
     def extra_repr(self):
-        
-        return 'prior_mu={}, prior_sigma={}, in_features={}, out_features={}, bias={}'.format(self.prior_mu, self.prior_sigma, self.in_features, self.out_features, self.bias is not None)
-
+       return 'prior_mu={}, prior_sigma={}, in_features={}, out_features={}, bias={}'.format(self.prior_mu, self.prior_sigma, self.in_features, self.out_features, self.bias is not None)
+ 
