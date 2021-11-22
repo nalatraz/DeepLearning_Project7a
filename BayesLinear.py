@@ -35,10 +35,12 @@ class BayesLinear(Module):
     def reset_parameters(self):
         # Initialization method of Adv-BNN
         stdv = 1. / math.sqrt(self.weight_mu.size(1))
-        self.weight_mu.data.uniform_(-stdv, stdv)
+        #self.weight_mu.data.uniform_(-stdv, stdv)
+        self.weight_mu.data.normal_(0, stdv)
         self.weight_log_sigma.data.fill_(self.prior_log_sigma)
         if self.bias :
-            self.bias_mu.data.uniform_(-stdv, stdv)
+            #self.bias_mu.data.uniform_(-stdv, stdv)
+            self.bias_mu.data.normal_(0, stdv)
             self.bias_log_sigma.data.fill_(self.prior_log_sigma)
             
 #             self.bias_log_sigma.data.fill_(self.prior_log_sigma)
