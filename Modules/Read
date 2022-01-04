@@ -1,0 +1,3 @@
+This folder contains all modules required to run the Bayesian Neural Networks. It includes:
+- Bayes linear layer class
+- Loss function computations
